@@ -1,25 +1,51 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Reproducible Research - Peer Assessments 1"
+author: "Saul Lugo"
+date: "September 19, 2015"
+output: html_document
 ---
 
+First load "knitr" and set the global options for knitr
 
-## Loading and preprocessing the data
+```{r set_options}
+require(knitr)
+opts_chunk$set(echo=TRUE)
+```
 
+The data will be loaded from the zip file provided in the course, and the resulting csv will be stored inside a directory named "data" in your working directory.
 
+```{r load_data}
+if(!file.exists("./data/activity.csv")){
+        if(!file.exists("./data/")) dir.create("data")
+        if(!file.exists("activity.zip")) stop("The data file does not exists in the directory, you must download the file activity.zip")
+        unzip("activity.zip",exdir="data")
+}
+#Reading the dataset
+data <- read.csv("./data/activity.csv")
+```
 
-## What is mean total number of steps taken per day?
+##First Question: What is the mean total number of steps taken per day?
 
+1) Calculating the total number of steps taken per day.In this part of the assigment I am ignoring the NAs values in the dataset.
 
+```{r steps}
+steps_per_day <- tapply(data$steps,data$date,sum)
+```
 
-## What is the average daily activity pattern?
+2) Making a histogram of steps_per_day. This will make a graphic representation of how frequent a certain number of steps was taken by the individual in a day during the measurement period.
 
+```{r steps_hist}
+hist(steps_per_day,main="Number of Steps per Day",xlab="Number of Steps",breaks = 10,freq=TRUE,col="blue")
+```
 
+3) Calculating the mean and median of the total number of steps taken by day
 
-## Imputing missing values
+```{r steps_mean_median}
+#The mean of the total number of steps taken each day is:
+mean_steps <- mean(steps_per_day[!is.na(steps_per_day)])
+mean_steps
+#The median of total number of steps taken each day is:
+median_steps <- median(steps_per_day[!is.na(steps_per_day)])
+median_steps
+```
 
-
-
-## Are there differences in activity patterns between weekdays and weekends?
