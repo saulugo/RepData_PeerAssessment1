@@ -24,7 +24,7 @@ if(!file.exists("./data/activity.csv")){
 data <- read.csv("./data/activity.csv")
 ```
 
-##First Question: What is the mean total number of steps taken per day?
+##Question 1: What is the mean total number of steps taken per day?
 
 1) Calculating the total number of steps taken per day.In this part of the assigment I am ignoring the NAs values in the dataset.
 
@@ -47,5 +47,55 @@ mean_steps
 #The median of total number of steps taken each day is:
 median_steps <- median(steps_per_day[!is.na(steps_per_day)])
 median_steps
+```
+
+##Question 2: What is the average daily activity pattern?
+
+1) Making a time series plot of 5-min interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+
+```{r activity_pattern}
+mean_steps_per_interval <- tapply(data$steps,data$interval,mean,na.rm=TRUE)
+plot(mean_steps_per_interval,type="l",col="blue",main="Average steps taken per 5-min interval")
+```
+
+2) Which 5-min interval, on average across all the days in the dataset, contains the maximum number of steps?
+To answer this question I used the function "which.max"
+```{r max_number_steps}
+x <- which.max(mean_steps_per_interval)
+"The 5-min that contains, in average, the maximum number of steps is the interval number:"
+x[[1]]
+```
+
+##Question 3: Imputing missiong values
+
+Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+
+1) Calculate and report the total number of missing values in the dataset (i.e.the total number of rows with NAs)
+```{r missing_values}
+n_missing_values <- length(data[is.na(data$steps),]$steps)
+"Number of row with missing values"
+n_missing_values
+```
+
+2) Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+```{r filling_missing_values}
+require(dplyr)
+stepsMissing <- function(d){
+        vec <- vector("numeric",length=length(d$steps))
+        
+        for(i in seq_along(vec)){
+                if(is.na(d$steps[i])){
+                        m <- tapply(d$steps,d$interval==d$interval[i],mean,na.rm=TRUE)
+                        vec[i] <- m[[2]]
+                }else{
+                        vec[i] <- d$steps[i]
+                }
+        }
+        vec
+}
+
+fixed_data <- mutate(data, steps = stepsMissing(data))
+head(fixed_data)
 ```
 
